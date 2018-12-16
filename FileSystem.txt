@@ -1,0 +1,128 @@
+Hadoop File System
+Port: hdfs://localhost:19000
+hdfs://localhost:19000/user/joe/TestFile.txt
+URI uri=URI.create (“hdfs://host: port/path”);
+
+ uri could be configured in core-site.xml file as below
+ <property><name>fs.default.name</name>
+ <value>hdfs://localhost:9000</value></property>
+ 
+ Path path=new Path (uri);
+ Configuration conf = new Configuration ();
+ conf.set("fs.default.name", “hdfs://localhost:9000”);
+ 
+ URI uri = URI.create (“hdfs://host: port/file path”);
+ Configuration conf = new Configuration ();
+ FileSystem file = FileSystem.get (uri, conf);
+FSDataInputStream in = file.open(new Path(uri));
+
+
+FileSystem file = FileSystem.get (uri, conf);
+        FSDataInputStream in = file.open(new Path(uri));
+        byte[] btbuffer = new byte[5];
+        in.seek(5); // sent to 5th position
+        Assert.assertEquals(5, in.getPos());
+        in.read(btbuffer, 0, 5);//read 5 byte in byte array from offset 0
+        System.out.println(new String(btbuffer));// &amp;amp;amp;quot; print 5 character from 5th position
+      in.read(10,btbuffer, 0, 5);// print 5 character staring from 10th position
+      
+      
+ Read Operation In HDFS
+Data read request is served by HDFS, NameNode and DataNode. 
+Let's call reader as a 'client'.
+Client initiates read request by calling 'open()' method of FileSystem
+object; it is an object of type DistributedFileSystem.
+This object connects to namenode using RPC and gets metadata
+information such as the locations of the blocks of the file. Please 
+note that these addresses are of first few block of file.
+In response to this metadata request, addresses of the DataNodes 
+having copy of that block, is returned back.
+Once addresses of DataNodes are received, an object of type 
+FSDataInputStream is returned to the client. FSDataInputStream 
+contains DFSInputStream which takes care of interactions with 
+DataNode and NameNode. In step 4 shown in above diagram, client 
+invokes 'read()' method which causes DFSInputStream to establish a 
+connection with the first DataNode with the first block of file.
+Data is read in the form of streams wherein client invokes 'read()' 
+method repeatedly. This process of read() operation continues till it 
+reaches end of block.
+Once end of block is reached, DFSInputStream closes the connection 
+and moves on to locate the next DataNode for the next block
+Once client has done with the reading, it calls close() method.
+
+
+we will understand how data is written into HDFS through files.
+Client initiates write operation by calling 'create()' method of DistributedFileSystem object which creates a new file - Step no. 1 in above diagram.
+DistributedFileSystem object connects to the NameNode using RPC call and initiates new file creation. However, this file create operation does not associate any blocks with the file. It is the responsibility of NameNode to verify that the file (which is being created) does not exist already and client has correct permissions to create new file. If file already exists or client does not have sufficient permission to create a new file, then IOException is thrown to client. Otherwise, operation succeeds and a new record for the file is created by the NameNode.
+Once new record in NameNode is created, an object of type FSDataOutputStream is returned to the client. Client uses it to write data into the HDFS. Data write method is invoked (step 3 in diagram).
+FSDataOutputStream contains DFSOutputStream object which looks after communication with DataNodes and NameNode. While client continues writing data, DFSOutputStream continues creating packets with this data. These packets are en-queued into a queue which is called as DataQueue.
+There is one more component called DataStreamer which consumes this DataQueue. DataStreamer also asks NameNode for allocation of new blocks thereby picking desirable DataNodes to be used for replication.
+Now, the process of replication starts by creating a pipeline using DataNodes. In our case, we have chosen replication level of 3 and hence there are 3 DataNodes in the pipeline.
+The DataStreamer pours packets into the first DataNode in the pipeline.
+Every DataNode in a pipeline stores packet received by it and forwards the same to the second DataNode in pipeline.
+Another queue, 'Ack Queue' is maintained by DFSOutputStream to store packets which are waiting for acknowledgement from DataNodes.
+Once acknowledgement for a packet in queue is received from all DataNodes in the pipeline, it is removed from the 'Ack Queue'. In the event of any DataNode failure, packets from this queue are used to reinitiate the operation.
+After client is done with the writing data, it calls close() method (Step 9 in the diagram) Call to close(), results into flushing remaining data packets to the pipeline followed by waiting for acknowledgement.
+Once final acknowledgement is received, NameNode is contacted to tell it that the file write operation is complete.
+
+
+// Code and API
+FileSystem hdfs =FileSystem.get(new Configuration());
+Path homeDir=hdfs.getHomeDirectory();
+System.out.println(“Home folder -” +homeDir);
+
+Path workingDir=hdfs.getWorkingDirectory();
+Path newFolderPath= new Path(“/MyDataFolder”);
+newFolderPath=Path.mergePaths(workingDir, newFolderPath);
+if(hdfs.exists(newFolderPath))
+{
+	hdfs.delete(newFolderPath, true); //Delete existing Directory
+}
+hdfs.mkdirs(newFolderPath);     //Create new Directory
+
+Path localFilePath = new Path(“c://localdata/datafile1.txt”);
+Path hdfsFilePath=new Path(newFolderPath+”/dataFile1.txt”);
+hdfs.copyFromLocalFile(localFilePath, hdfsFilePath);
+
+localFilePath=new Path(“c://hdfsdata/datafile1.txt”);
+hdfs.copyToLocalFile(hdfsFilePath, localFilePath);
+
+Path newFilePath=new Path(newFolderPath+”/newFile.txt”);
+hdfs.createNewFile(newFilePath);
+
+Writing data to a HDFS file
+StringBuilder sb=new StringBuilder();for(int i=1;i<=5;i++)
+{
+
+sb.append(“Data”);
+
+sb.append(i);
+
+sb.append(“\n”);
+
+}
+
+byte[] byt=sb.toString().getBytes();
+
+FSDataOutputStream fsOutStream = hdfs.create(newFilePath);
+
+fsOutStream.write(byt);
+
+fsOutStream.close();
+
+Reading data From HDFS File
+BufferedReader bfr=new BufferedReader(new InputStreamReader(hdfs.open(newFilePath)));String str = null;
+while ((str = bfr.readLine())!= null)
+
+{
+
+System.out.println(str);
+
+}
+
+
+
+
+
+
+ 

@@ -1,0 +1,6 @@
+ABCD abcd
+abcd ABCD
+AB1CD1 abcd1
+abcd4 ABCD1
+ABCD5 ab4cd
+ab9cd AB7CD

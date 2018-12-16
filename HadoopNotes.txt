@@ -1,0 +1,75 @@
+10^21 Zettabytes in 2006 0.18, 1 billion terabytes
+2011 1.8
+The New York Stock Exchange generates about one
+terabyte of new trade data per day.
+• Facebook hosts approximately 10 billion photos, taking up one 
+petabyte of storage.
+• Ancestry.com, the genealogy site, stores around 2.5 petabytes of data.
+• The Internet Archive stores around 2 petabytes of data, and is growing
+at a rate of 20 terabytes per month.
+• The Large Hadron Collider near Geneva, Switzerland, will produce about 15
+petabytes of data per year.
+Hadoop
+Using the solution provided by Google,
+Doug Cutting and his team developed an Open Source Project
+called HADOOP.
+Hadoop is an Apache open source framework written in java that
+allows distributed processing of large datasets across clusters of
+computers using simple programming models. The Hadoop framework 
+application works in an environment that provides distributed storage 
+and computation across clusters of computers. Hadoop is designed to
+scale up from single server to thousands of machines, each offering
+local computation and storage.
+April 2008 ,910 cluster,  	1 Terabyte in 209 Seconds Hadoop
+May 2009 ,  	1 Terabyte in 68 Seconds Map Reduce
+2009 ,  	1 Terabyte in 63 Seconds Hadoop at Yahoo
+Yahoo April 2009—Won the minute sort by sorting 500 GB in 59 
+seconds (on 1,400 nodes) and the 100 terabyte sort in 173 
+minutes (on 3,400 nodes).
+Common
+A set of components and interfaces for distributed filesystems and 
+general I/O (serialization, Java RPC, persistent data structures).
+
+Avro
+A serialization system for efficient, cross-language RPC, and 
+persistent data storage.
+
+MapReduce
+A distributed data processing model and execution environment that runs
+on large clusters of commodity machines.
+
+HDFS
+A distributed filesystem that runs on large clusters of commodity machines.
+
+Pig
+A data flow language and execution environment for exploring very large
+datasets. Pig runs on HDFS and MapReduce clusters.
+
+Hive
+A distributed data warehouse. Hive manages data stored in HDFS and
+provides a query language based on SQL (and which is translated by 
+the runtime engine to MapReduce jobs) for querying the data.
+
+HBase
+A distributed, column-oriented database. HBase uses HDFS for its 
+underlying storage, and supports both batch-style computations using 
+MapReduce and point queries (random reads).
+
+ZooKeeper
+
+A distributed, highly available coordination service. ZooKeeper provides 
+primitives such as distributed locks that can be used for building 
+distributed applications. 
+
+Sqoop
+A tool for efficiently moving data between relational databases and HDFS.
+
+
+Big data is not a single technology but a combination of old and new technologies
+that helps companies gain actionable insight. Therefore, big data is
+and within the right time frame to allow real-time analysis and reaction. As
+we note earlier in this chapter, big data is typically broken down by three
+characteristics:
+? Volume: How much data
+? Velocity: How fast that data is processed
+? Variety: The various types of data

@@ -1,0 +1,52 @@
+I would suggest you downloading million songs Dataset from the following website:
+
+http://labrosa.ee.columbia.edu/millionsong/
+
+The best thing with Millions Songs Dataset is that you can download 1GB (about 10000 songs), 10GB, 50GB or about 300GB dataset to your Hadoop cluster and do whatever test you would want. I love using it and learn a lot using this data set.
+
+To start with you can download dataset start with any one letter from A-Z, which will be range from 1GB to 20GB.. you can also use Infochimp site:
+
+http://www.infochimps.com/collections/million-songs
+
+In one of my following blog I showed how to download 1GB dataset and run Pig scripts:
+
+http://blogs.msdn.com/b/avkashchauhan/archive/2012/04/12/processing-million-songs-dataset-with-pig-scripts-on-apache-hadoop-on-windows-azure.aspx
+
+Tom White mentioned about a sample weather data set in his Book(Hadoop: the definitive guide).
+
+http://hadoopbook.com/code.html
+
+Data is available for more than 100 years.
+
+I used wget in linux to pull the data. For the year 2007 itself the data size is 27 GB.
+
+It is hosted as an FTP link. So, you can download with any FTP utility.
+
+ftp://ftp.ncdc.noaa.gov/pub/data/noaa/
+
+For complete details please check my blog:
+
+http://myjourneythroughhadoop.blogspot.in/2013/07/how-to-download-weather-data-for-your.html
+
+
+There are public datasets availbale on Amazon: 
+http://aws.amazon.com/publicdatasets/ 
+I would suggest to consider running demo cluster there - and thus to save downloading. 
+There is also good dataset of the crowled web from Common Crawl, which is also available on amazon s3. http://commoncrawl.org/ 
+
+An article that might be of interest to you, "Using Hadoop to analyze the full Wikipedia dump files using WikiHadoop".
+
+If you are after Wikipedia page view statistics, then this might help. You can download pagecount files from 2007 up until current date. Just to give an idea of the size of the files, 1.9 GB for a single day (here I chose 2012-05-01) spread across 24 files.
+
+Currently, 31 countries have sites which make available public data in various formats, http://www.data.gov/opendatasites. In addition, the World Bank makes available data at http://data.worldbank.org/data-catalog
+
+What about "Internet Census 2012", data gathered by a distributed scan over the whole Internet:
+
+Announcement: http://seclists.org/fulldisclosure/2013/Mar/166
+
+Data: http://internetcensus2012.bitbucket.org/
+
+The whole data is 7TB, (obviously) only available by torrent.
+
+If you are interested in countries indicators, the best source I found was worldbank.org. The data they offer can be exported as CSV which makes it very easy to work with in Hadoop. If you are using .NET, I wrote a blogpost http://ryanlovessoftware.blogspot.ro/2014/02/creating-hadoop-framework-for-analysing.html where you can see how the data looks, and if you download the code from gidhub https://github.com/ryan-popa/Hadoop-Analysis, you already have the string parsing methods.
+

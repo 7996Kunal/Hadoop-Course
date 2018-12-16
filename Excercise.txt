@@ -1,0 +1,122 @@
+1)Process Wikipedia articles to get some interesting facts.
+2) Process Twitter logs e.g - sentiment analysis, trending topics, trending stocks, market feeling about certain product etc.
+3) Use weather dataset and try to device modeling algorithm for predicting future weather.
+4) Build your own search index on any large corpus .
+
+Exercise 3: Hadoop Kmer Counting
+
+The next exercise will be to implement a kmer counter using hadoop. Conceptually this is very similar to the wordcount program, but since there are no spaces in the human genome, we will count overlapping kmers instead of discrete words.
+The idea is if the genome is:
+
+>chr1
+ACACACAGT
+
+And we are counting 3-mers, your map function will output
+
+ACA   1
+CAC   1
+ACA   1
+CAC   1
+ACA   1
+CAG   1
+AGT   1
+
+The shuffle function will sort them so the same key comes right after each other
+
+ACA   1
+ACA   1
+ACA   1
+CAC   1
+CAC   1
+CAG   1
+AGT   1
+
+And your reducer will output:
+
+ACA   3
+CAC   2
+CAG   1
+AGT   1
+
+You can implement this in Java, using the WordCount program as an example, or you can use Hadoop Streaming to implement it in any language you would like.
+
+The Hadoop Streaming documentation describes how to use it:
+http://hadoop.apache.org/common/docs/r0.20.2/streaming.html
+
+And here is a nice tutorial using Python:
+http://www.michael-noll.com/tutorials/writing-an-hadoop-mapreduce-program-in-python/
+
+The genome file is available here: ecoli.fa.gz
+Question 3: What are the top 10 most frequently occurring 9-mers in E coli?
+
+And once this is working, you can test the entire human genome available here (hg19 means human genome, build 19): /bluearc/data/schatz/data/genomes/hg19/hg19.fa
+Question 4: What are the top 10 most frequently occurring 9-mers in HG19?
+
+
+Exercise 4: Hadoop Kmer Frequency Map
+
+The next step is to invert the kmer-frequency table so that the kmer counts are shown at each position along the genome. This is needed so that we can overlay the repeats in the genome with respect to genes and other features.
+For example, from the example above
+
+>chr1
+ACACACAGT
+
+We want to construct this table (chromosome, offset, kmer-count)
+
+chr1   1   3
+chr1   2   2
+chr1   3   3
+chr1   4   2
+chr1   5   3
+chr1   6   1
+chr1   7   1
+
+This cannot be done in a single MapReduce cycle - we have to first count kmer occurences and then resort them by position. The easiest approach is to modify your kmer counter to record the positions of each kmer, and then add a second MapReduce step that inverts the index and uses the sort capabilities of Hadoop to build the sorted map:
+Input:
+
+>chr1
+ACACACAGT
+
+Map Output 1 (mer, offset)
+
+ACA   1
+CAC   2
+ACA   3
+CAC   4
+ACA   5
+CAG   6
+AGT   7
+
+Output1 (cnt, offset-list):
+
+3   chr1:1,chr1:3,chr1:5
+2   chr1:2,chr1:4
+1   chr1:6
+1   chr1:7
+
+Map2 output (chromosome, offset, cnt):
+
+chr1   1   3
+chr1   3   3
+chr1   5   3
+chr1   2   2
+chr1   4   2
+chr1   6   1
+chr1   7   1
+
+Shuffle and sort the final output (chromosome, offset, cnt):
+
+chr1   1   3
+chr1   2   2
+chr1   3   3
+chr1   4   2
+chr1   5   3
+chr1   6   1
+chr1   7   1
+
+Once this is done, it is straightforward to scan the catalog to find unique regions. Here there is just one small unique region chr1:[6,7] but there could be many.
+Question 5: What are the top 10 longest unique regions in E coli using k=21?
+Hint: Check out the hadoop secondary sort.
+Question 6: What are the top 10 longest unique regions in the whole human genome using k=21?
+
+Since the map for the whole human genome will be so large (3 billion positions x ~20bytes = 60 GB), we will probably want to scan it in parallel too, but then we have to be very careful regions that span boundaries between map jobs. You may want to also investigate the hadoop compression options since the runtime will be proportional to the amount of data to shuffle. 
